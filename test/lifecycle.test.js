@@ -64,8 +64,18 @@ before(function (done) {
             // console.log(User);
             console.log('Created test users');
 
-            console.log('Sails lifted!');
-            return done();
+            var request = require('supertest');
+
+            request(sails.hooks.http.app)
+                .get('/csrfToken')
+                .set('Accept', 'application/json')
+                .then(response => {
+                    console.log(response.body);
+                    this._csrf = response.body._csrf;
+                    console.log('Sails lifted!');
+                    return done();
+                })
+                .catch(err => done(err))
         });
     } catch (err) {
         return done(err);
